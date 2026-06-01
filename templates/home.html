@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Enquête APC</title>
+    <style>
+        .container:{width:80%;}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Enquête APC</h1>
+        <p>Bonjour<br>
+            Uploader file ici :
+        <p><input type="file" name="file"></p>
+      <p><input type="submit" value="Submit"></p>
+        </p>
+        <h2>Table</h2>
+        {{tables | safe}}
+    </div>
+</body>
+</html>
