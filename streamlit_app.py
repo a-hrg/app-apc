@@ -14,17 +14,21 @@ def trouver_titre(doi):
     else:
         return "Erreur"
 
+df_liste=[]
+
 uploaded_files = st.file_uploader(
-    "Upload images", accept_multiple_files="directory", type=["jpg", "png"]
+    "Upload files", accept_multiple_files="directory", type=["xlsx","csv"]
 )
 for uploaded_file in uploaded_files:
     if uploaded_file is not None:
         df = pd.read_excel(uploaded_file)
-        st.write(uploaded_file)
+        st.write(df)
 
         if st.button("Moissonnage OpenAlex"):
             df['Titre'] = df['DOI'].apply(lambda x: trouver_titre(x))
             st.write(df)
+
+    df_liste.append(df)
 
     @st.cache_data
     def convert_df(df):
@@ -32,15 +36,16 @@ for uploaded_file in uploaded_files:
 
     csv = convert_df(df)
 
-    with ZipFile('fichiers_etablissements.zip', 'w') as csv_zip:
-        for file in directory:
-            df.to_csv(f'sample_{i}.csv') #this will convert the dataframe to a .csv
-            zf.write(f'sample_{i}.csv') #this will put the .csv in the zipfile
-            os.remove(f'sample_{i}.csv') #this will delete the .csv created 
+with zipfile.ZipFile('fichiers_etablissements.zip', 'w', zipfile.ZIP_DEFLATED) as csv_zip:
+    for file,f in zip(df_liste,uploaded_files):
+        filename=f.name
+        file.to_csv(f"{filename}",index=False)
+        csv_zip.writestr(f"{filename}")
 
-st.download_button(
-    label="Download zip",
-    data=buf.getvalue(),
-    file_name="fichiers_établissements.zip",
-    mime="application/zip",
-)
+with open("fichiers_etablissements.zip", "rb") as z:
+    btn = st.download_button(
+            label = "Download zip",
+            data = z,
+            file_name = "fichiers_etablissements.zip",
+            mime = "application/zip"
+          )
