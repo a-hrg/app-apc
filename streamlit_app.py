@@ -1,4 +1,7 @@
 import streamlit as st
+import pandas as pd
+import requests
+import zipfile
 
 def trouver_titre(doi):
     print(doi)
@@ -11,15 +14,17 @@ def trouver_titre(doi):
     else:
         return "Erreur"
 
-uploaded_file = st.file_uploader("Choose a file")
-if uploaded_file is not None:
-    df = pd.read_excel(uploaded_file)
-    st.write(df)
+uploaded_files = st.file_uploader(
+    "Upload images", accept_multiple_files="directory", type=["jpg", "png"]
+)
+for uploaded_file in uploaded_files:
+    if uploaded_file is not None:
+        df = pd.read_excel(uploaded_file)
+        st.write(uploaded_file)
 
-
-    if st.button("API"):
-        df['Titre'] = df['DOI'].apply(lambda x: trouver_titre(x))
-        st.write(df)
+        if st.button("Moissonnage OpenAlex"):
+            df['Titre'] = df['DOI'].apply(lambda x: trouver_titre(x))
+            st.write(df)
 
     @st.cache_data
     def convert_df(df):
@@ -27,10 +32,15 @@ if uploaded_file is not None:
 
     csv = convert_df(df)
 
-    st.download_button(
-        "Press to Download",
-        csv,
-        "file.csv",
-        "text/csv",
-        key='download-csv'
-    )
+    with ZipFile('fichiers_etablissements.zip', 'w') as csv_zip:
+        for file in directory:
+            df.to_csv(f'sample_{i}.csv') #this will convert the dataframe to a .csv
+            zf.write(f'sample_{i}.csv') #this will put the .csv in the zipfile
+            os.remove(f'sample_{i}.csv') #this will delete the .csv created 
+
+st.download_button(
+    label="Download zip",
+    data=buf.getvalue(),
+    file_name="fichiers_établissements.zip",
+    mime="application/zip",
+)
