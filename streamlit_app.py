@@ -145,8 +145,8 @@ if uploaded_files:
             for df,file in zip(df_liste,uploaded_files):
                 filename=file.name
                 filename=Path(filename).stem
-                df.to_csv(f'{filename}_modifié.csv') #this will convert the dataframe to a .csv
-                zf.write(f'{filename}_modifié.csv') #this will put the .csv in the zipfile
+                df.to_excel(f'{filename}_modifié.xlsx', index=False)
+                zf.write(f'{filename}_modifié.xlsx')
 
         with open('enquete_etablissements_modifies.zip', 'rb') as f:
             st.download_button('Télécharger le zip', f, file_name='enquete_etablissements_modifies.zip')
