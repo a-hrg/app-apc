@@ -112,6 +112,17 @@ def auteur_doi(responses_json):
     auteurs = ', '.join(liste)
     return auteurs
 
+def statut_revue(issn):
+    if not issn or issn=='False': return "False"
+
+    url = f'https://api.openalex.org/sources/issn_l:{issn}'
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        responses_json = json.loads(response.content.decode('utf-8'))
+        is_oa=responses_json.get('is_oa')
+        if is_oa==False: return "Hybride"
+        else: return "Full OA"
+
 #####----- main
 
 st.title('Enquête APC - Enrichissement')
@@ -132,6 +143,7 @@ if uploaded_files:
                     df['Auteur de correspondance'] = df['rep_api'].apply(lambda x: auteur_doi(x))
                     df['Revue'] = df['rep_api'].apply(lambda x: revue_doi(x))
                     df['ISSN_L'] = df['rep_api'].apply(lambda x: issn_doi(x))
+                    df['Type de revue'] = df['ISSN_L'].apply(lambda x: statut_revue(x))
                     df['Editeur'] = df['rep_api'].apply(lambda x: editeur_doi(x))
                     df['Année de publication'] = df['rep_api'].apply(lambda x: annee_doi(x))
                     df['Licence'] = df['rep_api'].apply(lambda x: licence_doi(x))
