@@ -7,7 +7,7 @@ import zipfile
 
 #####----- paramètres + fonctions
 
-API_KEY = "NeiyFtd6q8vUxkDmPXjK8g"
+API_KEY = st.secrets['API_KEY']
 headers = {'api_key': f'{API_KEY}'}
 
 df_liste=[]
