@@ -123,6 +123,13 @@ def statut_revue(issn):
         if is_oa==False: return "Hybride"
         else: return "Full OA"
 
+def doublon_compil(doi):
+    doi_compilation=compilation['DOI'].to_list()
+    if doi in doi_compilation:
+        return "True"
+    else:
+        return "False"
+
 #####----- main
 
 st.title('Enquête APC - Enrichissement')
@@ -130,6 +137,13 @@ st.title('Enquête APC - Enrichissement')
 uploaded_files = st.file_uploader(
     "Sélectionner le dossier contenant les fichiers à traiter :", accept_multiple_files="directory", type=["xlsx","csv"]
 )
+
+compilation_file = st.file_uploader(
+    "Charger la compilation APC", accept_multiple_files=True, type=["xlsx","csv"]
+)
+
+for file in compilation_file:
+    compilation = pd.read_excel(file)
 
 if uploaded_files:
     if st.button("Moissonnage OpenAlex"):
@@ -142,13 +156,16 @@ if uploaded_files:
                     df['Titre'] = df['rep_api'].apply(lambda x: titre_doi(x))
                     df['Auteur de correspondance'] = df['rep_api'].apply(lambda x: auteur_doi(x))
                     df['Revue'] = df['rep_api'].apply(lambda x: revue_doi(x))
-                    df['ISSN_L'] = df['rep_api'].apply(lambda x: issn_doi(x))
-                    df['Type de revue'] = df['ISSN_L'].apply(lambda x: statut_revue(x))
+                    df['Issn_l'] = df['rep_api'].apply(lambda x: issn_doi(x))
+                    df['Type de revue'] = df['Issn_l'].apply(lambda x: statut_revue(x))
                     df['Editeur'] = df['rep_api'].apply(lambda x: editeur_doi(x))
+                    compilation_editeur=compilation[['TypeEditeur','Issn_l']]
+                    compilation_editeur=compilation_editeur.drop_duplicates(subset=['Issn_l'])
+                    df = df.merge(compilation_editeur,on="Issn_l",how="left")
                     df['Année de publication'] = df['rep_api'].apply(lambda x: annee_doi(x))
                     df['Licence'] = df['rep_api'].apply(lambda x: licence_doi(x))
                     df['Statut_OA'] = df['rep_api'].apply(lambda x: oa_doi(x))
-
+                    df['Compilation_Doublon'] = df['DOI'].apply(lambda x: doublon_compil(x))
                     df=df.drop(columns=['rep_api'])
                     st.write(df)
                     df_liste.append(df)
@@ -160,5 +177,5 @@ if uploaded_files:
                 df.to_excel(f'{filename}_modifié.xlsx', index=False)
                 zf.write(f'{filename}_modifié.xlsx')
 
-        with open('enquete_etablissements_modifies.zip', 'rb') as f:
-            st.download_button('Télécharger le zip', f, file_name='enquete_etablissements_modifies.zip')
+    with open('enquete_etablissements_modifies.zip', 'rb') as f:
+        st.download_button('Télécharger le zip', f, file_name='enquete_etablissements_modifies.zip')
