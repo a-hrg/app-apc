@@ -170,12 +170,12 @@ if uploaded_files:
                     st.write(df)
                     df_liste.append(df)
 
-        with zipfile.ZipFile('enquete_etablissements_modifies.zip', 'w') as zf:
-            for df,file in zip(df_liste,uploaded_files):
-                filename=file.name
-                filename=Path(filename).stem
-                df.to_excel(f'{filename}_modifié.xlsx', index=False)
-                zf.write(f'{filename}_modifié.xlsx')
+    with zipfile.ZipFile('enquete_etablissements_modifies.zip', 'w') as zf:
+        for df,file in zip(df_liste,uploaded_files):
+            filename=file.name
+            filename=Path(filename).stem
+            df.to_excel(f'{filename}_modifié.xlsx', index=False)
+            zf.write(f'{filename}_modifié.xlsx')
 
     with open('enquete_etablissements_modifies.zip', 'rb') as f:
         st.download_button('Télécharger le zip', f, file_name='enquete_etablissements_modifies.zip')
