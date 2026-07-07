@@ -151,7 +151,7 @@ if uploaded_files:
             if file is not None:
                 with st.spinner("En cours...", show_time=True):
                     df = pd.read_excel(file)
-                    df['rep_api'] = df['DOI'].apply(lambda x: doi_api(x))
+                    df['rep_api'] = df['doi'].apply(lambda x: doi_api(x))
 
                     df['Titre'] = df['rep_api'].apply(lambda x: titre_doi(x))
                     df['Auteur de correspondance'] = df['rep_api'].apply(lambda x: auteur_doi(x))
@@ -165,7 +165,7 @@ if uploaded_files:
                     df['Année de publication'] = df['rep_api'].apply(lambda x: annee_doi(x))
                     df['Licence'] = df['rep_api'].apply(lambda x: licence_doi(x))
                     df['Statut_OA'] = df['rep_api'].apply(lambda x: oa_doi(x))
-                    df['Compilation_Doublon'] = df['DOI'].apply(lambda x: doublon_compil(x))
+                    df['Compilation_Doublon'] = df['doi'].apply(lambda x: doublon_compil(x))
                     df=df.drop(columns=['rep_api'])
                     st.write(df)
                     df_liste.append(df)
