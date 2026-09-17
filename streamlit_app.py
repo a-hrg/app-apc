@@ -74,8 +74,8 @@ def issn_doi(responses_json):
             return issn_l
 
 def uniformisation_editeur(editeur):
-    if editeur in liste_editeurs['OpenAlex'].to_list():
-        editeur_uniformise = liste_editeurs.loc[liste_editeurs['OpenAlex']==editeur, 'Uniforme']
+    if editeur in list(liste_editeurs['OpenAlex']):
+        editeur_uniformise = liste_editeurs.loc[liste_editeurs['OpenAlex']==editeur, 'Uniforme'].values.item()
         return editeur_uniformise
     else:
         return editeur
