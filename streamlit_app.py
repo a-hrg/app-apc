@@ -5,6 +5,10 @@ import pandas as pd
 import requests
 import zipfile
 
+#####----- initialisation liste d'uniformisation
+
+liste_editeurs=pd.read_csv('uniformisation_editeur.csv',sep=';')
+
 #####----- paramètres + fonctions
 
 API_KEY = st.secrets['API_KEY']
@@ -69,6 +73,13 @@ def issn_doi(responses_json):
             issn_l = source.get('issn_l')
             return issn_l
 
+def uniformisation_editeur(editeur):
+    if editeur in liste_editeurs['OpenAlex'].to_list():
+        editeur_uniformise = liste_editeurs.loc[liste_editeurs['OpenAlex']==editeur, 'Uniforme']
+        return editeur_uniformise
+    else:
+        return editeur
+
 def editeur_doi(responses_json):
     if responses_json == "False": return "False"
     primary_location = responses_json.get('primary_location')
@@ -80,6 +91,7 @@ def editeur_doi(responses_json):
             return "False"
         else:
             host_organization_name = source.get('host_organization_name')
+            host_organization_name = uniformisation_editeur(host_organization_name)
             return host_organization_name
 
 def oa_doi(responses_json):
